@@ -11,29 +11,22 @@ const folders = {
   let isPaused = false;
   let interval;
   
-  // Allowed image extensions
-  const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
-  
-  // Toggle menu visibility
-  document.getElementById('menu-btn').addEventListener('click', () => {
-    const menu = document.getElementById('menu');
-    menu.classList.toggle('hidden');
-  });
-  
-  // Load images for a folder
+  // Fetch images from the server
   function loadImages(folderNames) {
     images = [];
     folderNames.forEach(folder => {
-      fetch(`images/${folder}/`)
-        .then(res => res.json()) // Replace this with logic to fetch the file list dynamically
-        .then(files => {
-          const validFiles = files.filter(file => {
-            const extension = file.split('.').pop().toLowerCase();
-            return allowedExtensions.includes(extension);
-          });
-          images.push(...validFiles.map(file => `images/${folder}/${file}`));
+      fetch(`/images-list?folder=${folder}`)
+        .then(response => {
+          if (!response.ok) throw new Error(`Failed to load images from ${folder}`);
+          return response.json();
         })
-        .catch(err => console.error(`Failed to load images from ${folder}:`, err));
+        .then(files => {
+          images.push(...files.map(file => `images/${folder}/${file}`));
+          if (currentFolder === folderNames[0]) {
+            startSlideshow(); // Start slideshow when images are loaded
+          }
+        })
+        .catch(err => console.error(err));
     });
   }
   
@@ -47,6 +40,7 @@ const folders = {
   
   // Start slideshow
   function startSlideshow() {
+    clearInterval(interval); // Clear any existing interval
     interval = setInterval(updateImage, 2000);
   }
   
@@ -91,5 +85,4 @@ const folders = {
   
   // Initial setup
   loadImages(folders[currentFolder]);
-  startSlideshow();
   
