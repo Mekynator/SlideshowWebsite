@@ -21,7 +21,9 @@ const folders = {
           return response.json();
         })
         .then(files => {
-          images.push(...files.map(file => `images/${folder}/${file}`));
+          const validFiles = files.map(file => `image/${folder}/${file}`);
+          images.push(...validFiles);
+          console.log('Loaded image paths:', images); // Debugging log
           if (currentFolder === folderNames[0]) {
             startSlideshow(); // Start slideshow when images are loaded
           }
@@ -33,7 +35,7 @@ const folders = {
   // Update image
   function updateImage() {
     if (images.length > 0) {
-        document.getElementById('slideshow-image').src = `${images[currentIndex]}?t=${Date.now()}`;
+      document.getElementById('slideshow-image').src = images[currentIndex];
       currentIndex = (currentIndex + 1) % images.length;
     }
   }
