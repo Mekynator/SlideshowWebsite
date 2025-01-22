@@ -6,39 +6,38 @@ let interval;
 
 // Fetch images from the server
 function loadImages(folderName) {
-  images = [];
-  if (folderName === "home") {
-    // Combine all folders for the home page
-    const folders = ["Registrations", "News", "Health_and_Safety"];
-    folders.forEach(folder => {
-      fetch(`/images-list?folder=${folder}`)
+    images = [];
+    if (folderName === "home") {
+      const folders = ["Registrations", "News", "Health_and_Safety"];
+      folders.forEach(folder => {
+        fetch(`/images-list?folder=${folder}`)
+          .then(response => {
+            if (!response.ok) throw new Error(`Failed to load images from ${folder}`);
+            return response.json();
+          })
+          .then(files => {
+            const validFiles = files.map(file => `image/${folder}/${file}`);
+            console.log(`Generated paths for ${folder}:`, validFiles); // Debugging log
+            images.push(...validFiles);
+            if (folder === folders[folders.length - 1]) {
+              startSlideshow();
+            }
+          })
+          .catch(err => console.error(`Error loading images for ${folder}:`, err));
+      });
+    } else {
+      fetch(`/images-list?folder=${folderName}`)
         .then(response => {
-          if (!response.ok) throw new Error(`Failed to load images from ${folder}`);
+          if (!response.ok) throw new Error(`Failed to load images from ${folderName}`);
           return response.json();
         })
         .then(files => {
-          const validFiles = files.map(file => `image/${folder}/${file}`);
-          images.push(...validFiles);
-          if (folder === folders[folders.length - 1]) {
-            startSlideshow(); // Start slideshow after loading all folders
-          }
+          images = files.map(file => `image/${folderName}/${file}`);
+          console.log(`Generated paths for ${folderName}:`, images); // Debugging log
+          startSlideshow();
         })
-        .catch(err => console.error(`Error loading images for ${folder}:`, err));
-    });
-  } else {
-    // Load images from a specific folder
-    fetch(`/images-list?folder=${folderName}`)
-      .then(response => {
-        if (!response.ok) throw new Error(`Failed to load images from ${folderName}`);
-        return response.json();
-      })
-      .then(files => {
-        images = files.map(file => `image/${folderName}/${file}`);
-        console.log(`Loaded images for ${folderName}:`, images);
-        startSlideshow();
-      })
-      .catch(err => console.error(`Error loading images for ${folderName}:`, err));
-  }
+        .catch(err => console.error(`Error loading images for ${folderName}:`, err));
+    }
 }
 
 // Update the current image in the slideshow
