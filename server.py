@@ -12,7 +12,7 @@ class CustomHandler(SimpleHTTPRequestHandler):
     def handle_images_list(self):
         # Extract folder from query string
         folder = self.path.split('?folder=')[-1]
-        folder_path = os.path.join(os.getcwd(), 'images', folder)
+        folder_path = os.path.join(os.getcwd(), 'image', folder)
 
         if not os.path.exists(folder_path):
             self.send_response(404)
