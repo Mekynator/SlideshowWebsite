@@ -11,16 +11,29 @@ const folders = {
   let isPaused = false;
   let interval;
   
+  // Allowed image extensions
+  const allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+  
+  // Toggle menu visibility
+  document.getElementById('menu-btn').addEventListener('click', () => {
+    const menu = document.getElementById('menu');
+    menu.classList.toggle('hidden');
+  });
+  
   // Load images for a folder
   function loadImages(folderNames) {
     images = [];
     folderNames.forEach(folder => {
-      fetch(`images/${folder}/`).then(res => {
-        // Assuming server supports directory browsing
-        res.json().then(files => {
-          images.push(...files.map(file => `images/${folder}/${file}`));
-        });
-      });
+      fetch(`images/${folder}/`)
+        .then(res => res.json()) // Replace this with logic to fetch the file list dynamically
+        .then(files => {
+          const validFiles = files.filter(file => {
+            const extension = file.split('.').pop().toLowerCase();
+            return allowedExtensions.includes(extension);
+          });
+          images.push(...validFiles.map(file => `images/${folder}/${file}`));
+        })
+        .catch(err => console.error(`Failed to load images from ${folder}:`, err));
     });
   }
   
@@ -49,7 +62,7 @@ const folders = {
     }
   }
   
-  // Event Listeners
+  // Event Listeners for pages
   document.getElementById('home-btn').addEventListener('click', () => {
     currentFolder = 'home';
     loadImages(folders[currentFolder]);
