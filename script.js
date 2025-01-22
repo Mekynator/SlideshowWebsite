@@ -33,7 +33,7 @@ const folders = {
   // Update image
   function updateImage() {
     if (images.length > 0) {
-      document.getElementById('slideshow-image').src = images[currentIndex];
+        document.getElementById('slideshow-image').src = `${images[currentIndex]}?t=${Date.now()}`;
       currentIndex = (currentIndex + 1) % images.length;
     }
   }
